@@ -24,7 +24,8 @@
 
   <body>
     <p><label for="pl_link_input">Link: </label><input style="width:500px;" type="text" id="pl_link_input" name="pllink" title="Link" value="https://www.youtube.com/playlist?list=PLtvoSgZUt3mkGaCeyzKxsc5oEro-7W2lw" readonly><button type="button" id="copy_music_pl_link" autofocus>Copy to clipboard</button>
-    <p><iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PLtvoSgZUt3mkGaCeyzKxsc5oEro-7W2lw" frameborder="0" allowfullscreen></iframe></p>
+    <p><button type="button" onclick="location.href='plviewer/plviewer.php?pl=PLtvoSgZUt3mkGaCeyzKxsc5oEro-7W2lw';" id="goto_pl_viewer">Open Playlist Viewer</button>
+	<p><iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PLtvoSgZUt3mkGaCeyzKxsc5oEro-7W2lw" frameborder="0" allowfullscreen></iframe></p>
   
     <p><a href="../index.html">Go back</a></p>
   </body>
