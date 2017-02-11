@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+  /*
+  img {
+    width: 256px;
+    height: 256px;
+    background: url(loading.gif) 50% no-repeat;
+    border: 1px solid black;
+    border-radius: 4px;
+  }
+  */
+  .img-container {
+    width: 256px;
+    height: 256px;
+    position: relative;
+    border: 1px solid black;
+    border-radius: 4px;
+    margin-bottom: 4px;
+  }
+  .img-bottom {
+    position: relative;
+    bottom: 10%;
+    left: 0;
+  }
+  .img-top {
+    position: absolute;
+    bottom: 6%;
+    width: 100%;
+    height: 50%;
+    z-index: 1;
+  }
+  </style>
+
+</head>
+<body>
+  <p><a href="../index.html">Go back</a></p>
+  <hr>
+  <div id="images"></div>
+
+<script>
+  window.onload = function() {
+    var parent = document.getElementById("images")
+    var start_string = "0x0250000000000"
+    var start = 0x918; //0x922;
+    var end = 0x9cd;
+    for (var i = start; i <= end; i++) {
+      var hex_string = start_string + i.toString(16).toUpperCase();
+
+      var div_element = document.createElement("div");
+      div_element.id = hex_string;
+
+      var div_img_container = document.createElement("div");
+      div_img_container.id = "img-container:" + hex_string;
+      div_img_container.className = "img-container";
+
+      var img_element_top = document.createElement("img");
+      img_element_top.src = "https://blzgdapipro-a.akamaihd.net/game/playerlevelrewards/" + hex_string + "_Rank.png";
+      img_element_top.className = "img-top";
+      div_img_container.appendChild(img_element_top);
+
+      var img_element_bottom = document.createElement("img");
+      img_element_bottom.src = "https://blzgdapipro-a.akamaihd.net/game/playerlevelrewards/" + hex_string + "_Border.png";
+      img_element_bottom.className = "img-bottom";
+      div_img_container.appendChild(img_element_bottom);
+
+      div_element.appendChild(div_img_container);
+
+      var label_element = document.createElement("label");
+      var text_node = document.createTextNode(hex_string);
+      label_element.htmlFor ="img-container:" + hex_string;
+      label_element.appendChild(text_node);
+      div_element.appendChild(label_element);
+
+      parent.appendChild(div_element);
+
+      parent.appendChild(document.createElement("hr"));
+    }
+  }
+
+  /*
+  For async loading
+  var image = document.images[0];
+  var downloadingImage = new Image();
+  downloadingImage.onload = function() {
+    image.src = this.src;
+  };
+  downloadingImage.src = "https://blzgdapipro-a.akamaihd.net/game/playerlevelrewards/0x0250000000000922_Rank.png";
+  */
+</script>
+
+</body>
+</html>
