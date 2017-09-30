@@ -16,9 +16,6 @@
     width: 256px;
     height: 256px;
     position: relative;
-    border: 1px solid black;
-    border-radius: 4px;
-    margin-bottom: 4px;
   }
   .img-bottom {
     position: relative;
@@ -32,6 +29,17 @@
     height: 50%;
     z-index: 1;
   }
+  .portrait {
+    width: 258px;
+	height: 281px;
+	float: left;
+	margin: 2px;
+	border: 1px solid black;
+    border-radius: 4px;
+  }
+  .portrait-label {
+    margin-left: 10px;
+  }
   </style>
 </head>
 <body>
@@ -44,12 +52,13 @@
     var parent = document.getElementById("images")
     var start_string = "0x0250000000000"
     var start = 0x918; //0x922;
-    var end = 0x9cd;
+    var end = 0x9d0; //0x9cd
     for (var i = start; i <= end; i++) {
       var hex_string = start_string + i.toString(16).toUpperCase();
 
       var div_element = document.createElement("div");
       div_element.id = hex_string;
+	  div_element.className = "portrait";
 
       var div_img_container = document.createElement("div");
       div_img_container.id = "img-container:" + hex_string;
@@ -71,11 +80,11 @@
       var text_node = document.createTextNode(hex_string);
       label_element.htmlFor ="img-container:" + hex_string;
       label_element.appendChild(text_node);
+	  label_element.className = "portrait-label";
       div_element.appendChild(label_element);
-
+	  
       parent.appendChild(div_element);
-
-      parent.appendChild(document.createElement("hr"));
+	  
     }
   }
   /*
