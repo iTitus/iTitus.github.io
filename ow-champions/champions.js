@@ -72,6 +72,24 @@ $(function () {
             }
         }
     });
+    $('#url-export-field').click(function () {
+        $(this).select();
+    });
+    $('#table-copy-modal').dialog({
+        modal: true,
+        autoOpen: false,
+        title: 'Copy the table',
+        buttons: {
+            'Copy': function () {
+                var f = $('#table-copy-field');
+                f.select();
+                document.execCommand('copy');
+            }
+        }
+    });
+    $('#table-copy-field').click(function () {
+        $(this).select();
+    });
 
     var select = $('#add-player-select');
     HEROES.forEach(function (hero, index) {
@@ -98,6 +116,17 @@ $(function () {
     });
 
     initHome();
+
+    if (window.location.href.includes('localhost') && !url.searchParams.has('load')) {
+        var obj = {players: [], game: {}};
+        for (var i = 0; i < 12; i++) {
+            obj.players.push('player' + (i < 10 ? '0' : '') + i);
+        }
+        obj.players.forEach(function (player, i) {
+            obj.game[player] = i;
+        });
+        url.searchParams.set('load', JSON.stringify(obj));
+    }
 
     if (url.searchParams.has('load')) {
         var toLoad = url.searchParams.get('load');
@@ -216,8 +245,15 @@ function displayGame() {
         field.val(exportURL());
         field.select();
         $('#url-export-modal').dialog('open');
+        field.width(field.prop('scrollWidth'));
     });
-    buttonDiv.append(nextRoundButton, addPlayerButton, shareButton);
+    var copyButton = $('<button>').text('Copy table').click(function () {
+        var field = $('#table-copy-field');
+        exportTable(field);
+        field.select();
+        $('#table-copy-modal').dialog('open');
+    });
+    buttonDiv.append(nextRoundButton, addPlayerButton, shareButton, copyButton);
 
     main.append(tableDiv, buttonDiv);
 }
@@ -342,4 +378,22 @@ function exportURL() {
         url.searchParams.set('load', savedGame);
     }
     return url.toString();
+}
+
+function exportTable(textarea) {
+    var text = '';
+    var rows = 1;
+    var cols = 1;
+    if (game) {
+        game.players.forEach(function (player) {
+            var line = player + ': ' + HEROES[game.game[player]];
+            var length = line.length;
+            if (length > cols) {
+                cols = line;
+            }
+            rows++;
+            text += line + '\n';
+        });
+    }
+    textarea.attr('rows', rows).attr('cols', cols).text(text);
 }

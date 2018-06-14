@@ -4,6 +4,7 @@
     <meta charset='utf-8'>
     <title>OW Champions</title>
     <link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.min.css" rel="stylesheet">
+    <link href="champions.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"
             integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
@@ -12,7 +13,7 @@
     <script src="champions.js"></script>
 </head>
 <body>
-<div id="main"></div>
+<div id="main" class="centered"></div>
 <div id="json-input-modal" class="inline">
     <input type="text" value="" class="required" name="json-input-field" id="json-input-field"
            style="display: inline-block;">
@@ -25,6 +26,10 @@
 <div id="url-export-modal" class="inline">
     <input type="text" value="" readonly class="required" name="url-export-field" id="url-export-field"
            style="display: inline-block;">
+</div>
+<div id="table-copy-modal" class="inline">
+    <textarea value="" readonly class="required table-copy-field" name="table-copy-field" id="table-copy-field"
+              style="display: inline-block;"></textarea>
 </div>
 </body>
 </html>
