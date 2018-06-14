@@ -3,6 +3,8 @@ const HERO = 'Hero';
 const WINNER = 'Winner';
 const POTG = 'PotG';
 
+const EMPTY_GAME = {players: [], game: {}};
+
 const MAX_PLAYERS = 12;
 const HEROES = [
     'Doomfist',
@@ -131,7 +133,7 @@ function initHome() {
 
 
 function loadNewGame() {
-    loadGameFromJSON();
+    loadGameFromJSON(EMPTY_GAME);
 }
 
 function loadPreviousGame() {
