@@ -32,8 +32,11 @@ const HEROES = [
     'Mercy',
     'Moira',
     'Symmetra',
-    'Zenyatta'
+    'Zenyatta',
+    'WINNER'
 ];
+const LAST_HERO = HEROES.length - 1 - 1;
+const WINNER_INDEX = LAST_HERO + 1;
 
 var game;
 
@@ -47,7 +50,11 @@ $(function () {
         title: 'Paste the saved game as JSON',
         buttons: {
             'Load': function () {
-                loadGameFromString($('#json-input-field').val());
+                var f = $('#json-input-field');
+                if (loadGameFromString(f.val())) {
+                    $('#json-input-modal').dialog('close');
+                    f.val('');
+                }
             }
         }
     });
@@ -57,16 +64,38 @@ $(function () {
         title: 'Copy the exported game link',
         buttons: {
             'Copy': function () {
-                console.log('copy');
+                var f = $('#url-export-field');
+                f.select();
+                document.execCommand('copy');
+            }
+        }
+    });
+
+    var select = $('#add-player-select');
+    HEROES.forEach(function (hero, index) {
+        var option = $('<option>').text(hero).attr('value', index);
+        select.append(option);
+    });
+    $('#add-player-modal').dialog({
+        modal: true,
+        autoOpen: false,
+        title: 'Enter player name and hero',
+        buttons: {
+            'Add': function () {
+                var pF = $('#add-player-field');
+                var hF = $('#add-player-select');
+                var player = pF.val();
+                var heroIndex = parseInt(hF.val());
+                if (addPlayer(player, heroIndex)) {
+                    $('#add-player-modal').dialog('close');
+                    pF.val('');
+                    hF.val('0');
+                }
             }
         }
     });
 
     initHome();
-
-    //DEBUG:
-    url.searchParams.set('load', '{"players":["player1","player2","player3","player4"],"game":{"player1":0,"player2":1,"player3":0,"player4":4}}');
-    //
 
     if (url.searchParams.has('load')) {
         var toLoad = url.searchParams.get('load');
@@ -114,8 +143,10 @@ function loadGameFromString(s) {
     try {
         json = JSON.parse(s);
     } catch (e) {
+        return false;
     }
     loadGameFromJSON(json);
+    return true;
 }
 
 function loadGameFromJSON(json) {
@@ -148,11 +179,22 @@ function displayGame() {
             var dataName = $('<td>').text(player);
             var dataHero = $('<td>').text(HEROES[heroIndex]);
             var dataWinner = $('<td>');
-            var radioWinner = $('<input>').attr('type', 'radio').attr('id', 'winner_' + player).attr('name', 'winner').data('player', player);
+            var radioWinner = $('<input>').attr('type', 'radio').attr('id', 'winner_' + player).attr('name', 'winner').prop('disabled', heroIndex === WINNER_INDEX).data('player', player).change(function () {
+                var winner = $('input[name=winner]:checked');
+                var potg = $('input[name=potg]:checked');
+                if (winner.length === 1 && game.game[winner.data('player')] !== WINNER_INDEX && potg.length === 1 && game.game[potg.data('player')] !== WINNER_INDEX) {
+                    $('#next-round-button').prop('disabled', false);
+                }
+            });
             dataWinner.append(radioWinner);
-
             var dataPotG = $('<td>');
-            var radioPotG = $('<input>').attr('type', 'radio').attr('id', 'potg_' + player).attr('name', 'potg').data('player', player);
+            var radioPotG = $('<input>').attr('type', 'radio').attr('id', 'potg_' + player).attr('name', 'potg').prop('disabled', heroIndex === WINNER_INDEX).data('player', player).change(function () {
+                var winner = $('input[name=winner]:checked');
+                var potg = $('input[name=potg]:checked');
+                if (winner.length === 1 && game.game[winner.data('player')] !== WINNER_INDEX && potg.length === 1 && game.game[potg.data('player')] !== WINNER_INDEX) {
+                    $('#next-round-button').prop('disabled', false);
+                }
+            });
             dataPotG.append(radioPotG);
             row.append(dataName, dataHero, dataWinner, dataPotG);
             table.append(row);
@@ -161,14 +203,19 @@ function displayGame() {
     tableDiv.append(table);
 
     var buttonDiv = $('<div>').addClass('button-container');
-    var nextRoundButton = $('<button>').text('Next round').click(function () {
+    var nextRoundButton = $('<button>').attr('id', 'next-round-button').text('Next round').prop('disabled', true).click(function () {
         nextRound();
     });
+    var addPlayerButton = $('<button>').text('Add Player').click(function () {
+        $('#add-player-modal').dialog('open');
+    });
     var shareButton = $('<button>').text('Share game').click(function () {
-        console.log(exportURL());
+        var field = $('#url-export-field');
+        field.val(exportURL());
+        field.select();
         $('#url-export-modal').dialog('open');
     });
-    buttonDiv.append(nextRoundButton, shareButton);
+    buttonDiv.append(nextRoundButton, addPlayerButton, shareButton);
 
     main.append(tableDiv, buttonDiv);
 }
@@ -177,12 +224,55 @@ function nextRound() {
     var winner = $('input[name=winner]:checked').data('player');
     var potg = $('input[name=potg]:checked').data('player');
 
+    if (typeof winner !== 'string' || winner.length === 0 || typeof  potg !== 'string' || potg.length === 0) {
+        console.log('Error: Cannot progress to next round with winner "' + winner + '" and PotG "' + potg + '"');
+        return false;
+    }
+
     game.players.forEach(function (player) {
-        game.game[player] += 1 + (player === winner ? 1 : 0) + (player === potg ? 1 : 0);
+        var heroIndex = game.game[player];
+        if (heroIndex <= LAST_HERO) {
+            var isWinner = player === winner;
+            var isPotG = player === potg;
+            if (heroIndex === LAST_HERO) {
+                if (isWinner || isPotG) {
+                    heroIndex = WINNER_INDEX;
+                }
+            } else {
+                heroIndex = Math.min(heroIndex + 1 + (isWinner ? 1 : 0) + (isPotG ? 1 : 0), LAST_HERO);
+            }
+            game.game[player] = heroIndex;
+        }
     });
 
     save();
     displayGame();
+    return true;
+}
+
+function addPlayer(player, heroIndex) {
+    if (!(typeof player === 'string') || player.length === 0) {
+        console.log('Error: "' + player + '" is not a valid new player name');
+        return false;
+    }
+    if (game.players.length >= MAX_PLAYERS) {
+        console.log('Error: Too many players in "' + game.players + '"');
+        return false;
+    }
+    if (game.players.includes(player)) {
+        console.log('Error: New player "' + player + '" already in players: "' + game.players + '"');
+        return false;
+    }
+    if (!(typeof heroIndex === 'number') || (heroIndex % 1) !== 0 || heroIndex < 0 || heroIndex >= HEROES.length) {
+        console.log('Error: "heroIndex": "' + heroIndex + '" for new player "' + player + '" invalid');
+        return false;
+    }
+    game.players.push(player);
+    game.game[player] = heroIndex;
+    save();
+
+    displayGame();
+    return true;
 }
 
 function sanitizeData(json) {
@@ -224,8 +314,8 @@ function sanitizeData(json) {
         data['game'] = game;
     } else {
         console.log('Error: JSON "' + json + '" invalid');
-        data['players'] = [];
-        data['game'] = {};
+        data.players = [];
+        data.game = {};
     }
     return data;
 }
@@ -245,9 +335,9 @@ function exportGame() {
 
 function exportURL() {
     var savedGame = exportGame();
-    var url = 'http://ititus.github.io/ow-champions/champions.html';
+    var url = new URL(window.location.href);
     if (savedGame && typeof savedGame === 'string' && savedGame.length > 0) {
-        url += '?load=' + savedGame;
+        url.searchParams.set('load', savedGame);
     }
-    return url;
+    return url.toString();
 }
