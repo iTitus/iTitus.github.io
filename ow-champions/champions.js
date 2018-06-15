@@ -448,10 +448,11 @@ function exportTable(game, textarea) {
     var rows = 1;
     var cols = 1;
     game.players.forEach(function (player) {
-        var line = player + ': ' + HEROES[game.game[player]];
+        var heroIndex = game.game[player];
+        var line = player + ': ' + HEROES[heroIndex] + ' (' + heroIndex + '/' + LAST_HERO + ')';
         var length = line.length;
         if (length > cols) {
-            cols = line;
+            cols = length;
         }
         rows++;
         text += line + (textarea ? '\n' : '<br>');
