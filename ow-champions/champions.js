@@ -43,9 +43,32 @@ const WINNER_INDEX = LAST_HERO + 1;
 var game;
 
 $(function () {
+    var select = $('#load-prev-select');
+    var games = load();
 
-    var url = new URL(window.location.href);
-
+    games.forEach(function (game_, i) {
+        var option = $('<option>').text(game_.date).attr('value', i).tooltip({
+            items: '*',
+            content: getTooltip(game_)
+        });
+        select.append(option);
+    });
+    select.attr('size', Math.max(1, select.children().length));
+    $('#load-prev-modal').dialog({
+        modal: true,
+        autoOpen: false,
+        title: 'Select previous game to load',
+        buttons: {
+            'Load': function () {
+                var s = $('#load-prev-select');
+                var gameIndex = parseInt(s.val());
+                if (games && games[gameIndex] && games[gameIndex].game) {
+                    loadGameFromJSON(games[gameIndex].game);
+                    $(this).dialog('close');
+                }
+            }
+        }
+    });
     $('#json-input-modal').dialog({
         modal: true,
         autoOpen: false,
@@ -53,8 +76,8 @@ $(function () {
         buttons: {
             'Load': function () {
                 var f = $('#json-input-field');
-                if (loadGameFromString(f.val())) {
-                    $('#json-input-modal').dialog('close');
+                if (loadGameFromJSONString(f.val())) {
+                    $(this).dialog('close');
                     f.val('');
                 }
             }
@@ -91,9 +114,9 @@ $(function () {
         $(this).select();
     });
 
-    var select = $('#add-player-select');
-    HEROES.forEach(function (hero, index) {
-        var option = $('<option>').text(hero).attr('value', index);
+    select = $('#add-player-select');
+    HEROES.forEach(function (hero, i) {
+        var option = $('<option>').text(hero).attr('value', i);
         select.append(option);
     });
     $('#add-player-modal').dialog({
@@ -107,7 +130,7 @@ $(function () {
                 var player = pF.val();
                 var heroIndex = parseInt(hF.val());
                 if (addPlayer(player, heroIndex)) {
-                    $('#add-player-modal').dialog('close');
+                    $(this).dialog('close');
                     pF.val('');
                     hF.val('0');
                 }
@@ -117,7 +140,8 @@ $(function () {
 
     initHome();
 
-    if (window.location.href.includes('localhost') && !url.searchParams.has('load')) {
+    var url = new URL(window.location.href);
+    if ((window.location.href.includes('localhost') || window.location.href.startsWith('file://')) && !url.searchParams.has('load')) {
         var obj = {players: [], game: {}};
         for (var i = 0; i < 12; i++) {
             obj.players.push('player' + (i < 10 ? '0' : '') + i);
@@ -132,10 +156,8 @@ $(function () {
         var toLoad = url.searchParams.get('load');
         if (toLoad === 'new') {
             loadNewGame();
-        } else if (toLoad === 'prev') {
-            loadPreviousGame()
-        } else {
-            loadGameFromString(toLoad);
+        } else if (typeof toLoad === 'string' && toLoad.startsWith('{') && toLoad.endsWith('}')) {
+            loadGameFromJSONString(toLoad);
         }
     }
 });
@@ -150,7 +172,7 @@ function initHome() {
     });
 
     var loadPrevious = $('<button>').text('Load Previous').click(function () {
-        loadPreviousGame()
+        $('#load-prev-modal').dialog('open');
     });
 
     var loadJSON = $('<button>').text('Load from JSON').click(function () {
@@ -165,11 +187,7 @@ function loadNewGame() {
     loadGameFromJSON(EMPTY_GAME);
 }
 
-function loadPreviousGame() {
-    loadGameFromJSON(Cookies.getJSON('game'));
-}
-
-function loadGameFromString(s) {
+function loadGameFromJSONString(s) {
     var json;
     try {
         json = JSON.parse(s);
@@ -249,7 +267,7 @@ function displayGame() {
     });
     var copyButton = $('<button>').text('Copy table').click(function () {
         var field = $('#table-copy-field');
-        exportTable(field);
+        exportTable(game, field);
         field.select();
         $('#table-copy-modal').dialog('open');
     });
@@ -360,8 +378,38 @@ function sanitizeData(json) {
 
 function save() {
     if (game) {
-        Cookies.set('game', game);
+        var games = {games: [{date: new Date(), game: sanitizeData(game)}]};
+        var gamesJSON = Cookies.getJSON('games');
+        if (gamesJSON && Array.isArray(gamesJSON.games)) {
+            gamesJSON.games.forEach(function (game_) {
+                if (game_.date && game_.game) {
+                    var date = new Date(game_.date);
+                    var game__ = sanitizeData(game_.game);
+                    if (game__.players.length > 0) {
+                        games.games.push({date: date, game: game__});
+                    }
+                }
+            })
+        }
+        Cookies.set('games', games, {expires: new Date(Number.MAX_VALUE)});
     }
+}
+
+function load() {
+    var games = Cookies.getJSON('games');
+    var list = [];
+    if (games && Array.isArray(games.games)) {
+        games.games.forEach(function (game_) {
+            if (game_.date && game_.game) {
+                var date = new Date(game_.date);
+                var game__ = sanitizeData(game_.game);
+                if (game__.players.length > 0) {
+                    list.push({date: date, game: game__});
+                }
+            }
+        });
+    }
+    return list;
 }
 
 function exportGame() {
@@ -380,20 +428,34 @@ function exportURL() {
     return url.toString();
 }
 
-function exportTable(textarea) {
+function getTooltip(game) {
+    var s = '';
+    if (game) {
+        if (game.date) {
+            s += 'Date: ' + game.date + '<br>';
+        }
+        s += 'Game:<br>' + exportTable(game.game);
+    }
+    return s;
+}
+
+function exportTable(game, textarea) {
+    game = sanitizeData(game);
     var text = '';
     var rows = 1;
     var cols = 1;
-    if (game) {
-        game.players.forEach(function (player) {
-            var line = player + ': ' + HEROES[game.game[player]];
-            var length = line.length;
-            if (length > cols) {
-                cols = line;
-            }
-            rows++;
-            text += line + '\n';
-        });
+    game.players.forEach(function (player) {
+        var line = player + ': ' + HEROES[game.game[player]];
+        var length = line.length;
+        if (length > cols) {
+            cols = line;
+        }
+        rows++;
+        text += line + (textarea ? '\n' : '<br>');
+    });
+    if (textarea) {
+        textarea.attr('rows', rows).attr('cols', cols).text(text);
+    } else {
+        return text;
     }
-    textarea.attr('rows', rows).attr('cols', cols).text(text);
 }
