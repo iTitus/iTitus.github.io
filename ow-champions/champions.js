@@ -53,7 +53,7 @@ $(function () {
         });
         select.append(option);
     });
-    select.attr('size', Math.max(1, select.children().length));
+    select.attr('size', Math.max(2, select.children().length));
     $('#load-prev-modal').dialog({
         modal: true,
         autoOpen: false,
