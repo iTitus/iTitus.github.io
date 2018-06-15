@@ -234,18 +234,14 @@ function displayGame() {
             });
             const dataWinner = $('<td>');
             const radioWinner = $('<input>').attr('type', 'radio').attr('id', 'winner_' + player).attr('name', 'winner').prop('disabled', heroIndex === WINNER_INDEX).data('player', player).change(function () {
-                const winner = $('input[name=winner]:checked');
-                const potg = $('input[name=potg]:checked');
-                if (winner.length === 1 && game.game[winner.data('player')] !== WINNER_INDEX && potg.length === 1 && game.game[potg.data('player')] !== WINNER_INDEX) {
+                if (canGoToNextRound()) {
                     $('#next-round-button').prop('disabled', false);
                 }
             });
             dataWinner.append(radioWinner);
             const dataPotG = $('<td>');
             const radioPotG = $('<input>').attr('type', 'radio').attr('id', 'potg_' + player).attr('name', 'potg').prop('disabled', heroIndex === WINNER_INDEX).data('player', player).change(function () {
-                const winner = $('input[name=winner]:checked');
-                const potg = $('input[name=potg]:checked');
-                if (winner.length === 1 && game.game[winner.data('player')] !== WINNER_INDEX && potg.length === 1 && game.game[potg.data('player')] !== WINNER_INDEX) {
+                if (canGoToNextRound()) {
                     $('#next-round-button').prop('disabled', false);
                 }
             });
@@ -260,7 +256,7 @@ function displayGame() {
     const nextRoundButton = $('<button>').attr('id', 'next-round-button').text('Next round').prop('disabled', true).click(function () {
         nextRound();
     });
-    const addPlayerButton = $('<button>').text('Add Player').click(function () {
+    const addPlayerButton = $('<button>').text('Add Player').prop('disabled', game.players.length >= MAX_PLAYERS).click(function () {
         $('#add-player-modal').dialog('open');
     });
     const shareButton = $('<button>').text('Share game').click(function () {
@@ -464,4 +460,10 @@ function exportTable(game, textarea) {
     } else {
         return text;
     }
+}
+
+function canGoToNextRound() {
+    const winner = $('input[name=winner]:checked');
+    const potg = $('input[name=potg]:checked');
+    return winner.length === 1 && game.game[winner.data('player')] !== WINNER_INDEX && potg.length === 1 && game.game[potg.data('player')] !== WINNER_INDEX
 }
