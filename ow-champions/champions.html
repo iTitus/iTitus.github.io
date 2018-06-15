@@ -76,6 +76,26 @@
         </div>
     </div>
 </div>
+<div id="edit-player-modal" class="modal fade" data-backdrop="static" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit player</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input readonly type="text" id="edit-player-input-old" style="display: none;">
+                <input type="text" id="edit-player-input-new">
+                <select id="edit-player-select"></select></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="edit-player-button">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div id="copy-link-modal" class="modal fade" data-backdrop="static" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">

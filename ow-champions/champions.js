@@ -4,6 +4,7 @@ const NAME = 'Name';
 const HERO = 'Hero';
 const WINNER = 'Winner';
 const POTG = 'PotG';
+const EDIT = 'Edit/Delete';
 
 const EMPTY_GAME = {players: [], game: {}};
 
@@ -83,6 +84,22 @@ $(function () {
         if (addPlayer(input.val(), parseInt(select.val()))) {
             $('#add-player-modal').modal('hide');
             input.val('');
+            select.val('0');
+        }
+    });
+
+    select = $('#edit-player-select');
+    HEROES.forEach(function (hero, i) {
+        select.append($('<option>').text(hero).attr('value', i));
+    });
+    $('#edit-player-button').click(function () {
+        const inputOld = $('#edit-player-input-old');
+        const inputNew = $('#edit-player-input-new');
+        const select = $('#edit-player-select');
+        if (editPlayer(inputOld.val(), inputNew.val(), parseInt(select.val()))) {
+            $('#edit-player-modal').modal('hide');
+            inputOld.val('');
+            inputNew.val('');
             select.val('0');
         }
     });
@@ -187,7 +204,8 @@ function displayGame() {
     const headerHero = $('<th>').text(HERO);
     const headerWinner = $('<th>').text(WINNER);
     const headerPotG = $('<th>').text(POTG);
-    headerRow.append(headerName, headerHero, headerWinner, headerPotG);
+    const headerEdit = $('<th>').text(EDIT);
+    headerRow.append(headerName, headerHero, headerWinner, headerPotG, headerEdit);
     table.append(headerRow);
     if (game) {
         const players = game.players;
@@ -198,7 +216,9 @@ function displayGame() {
             const heroIndex = game.game[player];
             const row = $('<tr>');
             const dataName = $('<td>').text(player);
-            const dataHero = $('<td>').text(HEROES[heroIndex]).tooltip({title: 'Hero: ' + heroIndex + '/' + LAST_HERO});
+            const dataHero = $('<td>').text(HEROES[heroIndex]).tooltip({
+                title: 'Hero: ' + heroIndex + '/' + LAST_HERO
+            });
             const dataWinner = $('<td>');
             const radioWinner = $('<input>').attr('type', 'radio').attr('id', 'winner_' + player).attr('name', 'winner').prop('disabled', heroIndex === WINNER_INDEX).data('player', player).change(function () {
                 if (canGoToNextRound()) {
@@ -213,7 +233,28 @@ function displayGame() {
                 }
             });
             dataPotG.append(radioPotG);
-            row.append(dataName, dataHero, dataWinner, dataPotG);
+            const dataEdit = $('<td>');
+            const divDrop = $('<div>').addClass('dropdown');
+            const buttonDropToggle = $('<button>').addClass('dropdown-toggle').attr('data-toggle', 'dropdown').text('...');
+            const divDropMenu = $('<div>').addClass('dropdown-menu');
+            const buttonEdit = $('<button>').addClass('dropdown-item').text('Edit').click(function () {
+                const inputOld = $('#edit-player-input-old');
+                const inputNew = $('#edit-player-input-new');
+                const select = $('#edit-player-select');
+                inputOld.val(player);
+                inputNew.val(player);
+                select.val(heroIndex);
+                $('#edit-player-modal').modal('show');
+            });
+            const buttonDelete = $('<button>').addClass('dropdown-item').text('Delete').click(function () {
+                if (confirm('Do you really want to delete "' + player + '" ?')) {
+                    deletePlayer(player);
+                }
+            });
+            divDropMenu.append(buttonEdit, buttonDelete);
+            divDrop.append(buttonDropToggle, divDropMenu);
+            dataEdit.append(divDrop);
+            row.append(dataName, dataHero, dataWinner, dataPotG, dataEdit);
             table.append(row);
         });
     }
@@ -269,6 +310,9 @@ function nextRound() {
 }
 
 function addPlayer(player, heroIndex) {
+    if (!game) {
+        return false;
+    }
     if (!(typeof player === 'string') || player.length === 0) {
         console.log('Error: "' + player + '" is not a valid new player name');
         return false;
@@ -285,11 +329,66 @@ function addPlayer(player, heroIndex) {
         console.log('Error: "heroIndex": "' + heroIndex + '" for new player "' + player + '" invalid');
         return false;
     }
+
     game.players.push(player);
     game.game[player] = heroIndex;
-    save();
 
+    save();
     displayGame();
+
+    return true;
+}
+
+function deletePlayer(player) {
+    if (!game) {
+        return false;
+    }
+    if (!(typeof player === 'string') || player.length === 0 || !game.players.includes(player)) {
+        console.log('Error: Player "' + player + '" not found in players: "' + game.players + '"');
+        return false;
+    }
+
+    game.players.splice(game.players.indexOf(player), 1);
+    delete game.game[player];
+
+    save();
+    displayGame();
+
+    return true;
+}
+
+function editPlayer(oldPlayer, newPlayer, newHeroIndex) {
+    if (!game) {
+        return false;
+    }
+    if (!(typeof oldPlayer === 'string') || oldPlayer.length === 0 || !game.players.includes(oldPlayer)) {
+        console.log('Error: Old player name "' + oldPlayer + '" not found in players: "' + game.players + '"');
+        return false;
+    }
+    if (!(typeof newPlayer === 'string') || newPlayer.length === 0) {
+        console.log('Error: New player name"' + newPlayer + '" is not a valid player name');
+        return false;
+    }
+    if (oldPlayer !== newPlayer && game.players.includes(newPlayer)) {
+        console.log('Error: New player name "' + newPlayer + '" already found in players: "' + game.players + '"');
+        return false;
+    }
+    if (!(typeof newHeroIndex === 'number') || (newHeroIndex % 1) !== 0 || newHeroIndex < 0 || newHeroIndex >= HEROES.length) {
+        console.log('Error: "newHeroIndex": "' + newHeroIndex + '" for new player "' + newPlayer + '" invalid');
+        return false;
+    }
+
+    if (oldPlayer !== newPlayer) {
+        game.players.splice(game.players.indexOf(oldPlayer), 1);
+        game.players.push(newPlayer);
+
+        delete game.game[oldPlayer];
+    }
+    game.game[newPlayer] = newHeroIndex;
+
+    save();
+    displayGame();
+
     return true;
 }
 
