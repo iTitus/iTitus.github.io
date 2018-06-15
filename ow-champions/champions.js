@@ -56,6 +56,10 @@ $(function () {
         }));
     });
     select.attr('size', Math.max(2, select.children().length));
+    /*$('#load-prev-modal').on('shown.bs.modal', function (e) {
+        $('#load-prev-select').focus();
+        $(this).modal('handleUpdate');
+    });*/
     $('#load-prev-button').click(function () {
         const select = $('#load-prev-select');
         const gameIndex = parseInt(select.val());
