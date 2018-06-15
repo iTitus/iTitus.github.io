@@ -45,99 +45,75 @@ const WINNER_INDEX = LAST_HERO + 1;
 let game;
 
 $(function () {
-    let select = $('#load-prev-select');
     const games = load();
 
+    let select = $('#load-prev-select');
     games.forEach(function (game_, i) {
-        const option = $('<option>').text(game_.date).attr('value', i).tooltip({
-            items: '*',
-            content: getTooltip(game_)
-        });
-        select.append(option);
+        select.append($('<option>').text(game_.date).attr('value', i).tooltip({
+            html: true,
+            title: getTooltip(game_)
+        }));
     });
     select.attr('size', Math.max(2, select.children().length));
-    $('#load-prev-modal').dialog({
-        modal: true,
-        autoOpen: false,
-        title: 'Select previous game to load',
-        buttons: {
-            'Load': function () {
-                const s = $('#load-prev-select');
-                const gameIndex = parseInt(s.val());
-                if (games && games[gameIndex] && games[gameIndex].game) {
-                    loadGameFromJSON(games[gameIndex].game);
-                    $(this).dialog('close');
-                }
-            }
+    $('#load-prev-button').click(function () {
+        const select = $('#load-prev-select');
+        const gameIndex = parseInt(select.val());
+        if (games && gameIndex && games[gameIndex] && games[gameIndex].game) {
+            loadGameFromJSON(games[gameIndex].game);
+            $('#load-prev-modal').modal('hide');
+            select.val('0');
         }
     });
-    $('#json-input-modal').dialog({
-        modal: true,
-        autoOpen: false,
-        title: 'Paste the saved game as JSON',
-        buttons: {
-            'Load': function () {
-                const f = $('#json-input-field');
-                if (loadGameFromJSONString(f.val())) {
-                    $(this).dialog('close');
-                    f.val('');
-                }
-            }
+
+    $('#load-json-button').click(function () {
+        const input = $('#load-json-input');
+        if (loadGameFromJSONString(input.val())) {
+            $('#load-json-modal').modal('hide');
+            input.val('');
         }
-    });
-    $('#url-export-modal').dialog({
-        modal: true,
-        autoOpen: false,
-        title: 'Copy the exported game link',
-        buttons: {
-            'Copy': function () {
-                const f = $('#url-export-field');
-                f.select();
-                document.execCommand('copy');
-            }
-        }
-    });
-    $('#url-export-field').click(function () {
-        $(this).select();
-    });
-    $('#table-copy-modal').dialog({
-        modal: true,
-        autoOpen: false,
-        title: 'Copy the table',
-        buttons: {
-            'Copy': function () {
-                const f = $('#table-copy-field');
-                f.select();
-                document.execCommand('copy');
-            }
-        }
-    });
-    $('#table-copy-field').click(function () {
-        $(this).select();
     });
 
     select = $('#add-player-select');
     HEROES.forEach(function (hero, i) {
-        const option = $('<option>').text(hero).attr('value', i);
-        select.append(option);
+        select.append($('<option>').text(hero).attr('value', i));
     });
-    $('#add-player-modal').dialog({
-        modal: true,
-        autoOpen: false,
-        title: 'Enter player name and hero',
-        buttons: {
-            'Add': function () {
-                const pF = $('#add-player-field');
-                const hF = $('#add-player-select');
-                const player = pF.val();
-                const heroIndex = parseInt(hF.val());
-                if (addPlayer(player, heroIndex)) {
-                    $(this).dialog('close');
-                    pF.val('');
-                    hF.val('0');
-                }
-            }
+    $('#add-player-button').click(function () {
+        const input = $('#add-player-input');
+        const select = $('#add-player-select');
+        if (addPlayer(input.val(), parseInt(select.val()))) {
+            $('#add-player-modal').modal('hide');
+            input.val('');
+            select.val('0');
         }
+    });
+
+    $('#copy-link-modal').on('shown.bs.modal', function (e) {
+        const input = $('#copy-link-input');
+        input.width(input.prop('scrollWidth')).select();
+        $(this).modal('handleUpdate');
+    });
+    $('#copy-link-input').click(function () {
+        $(this).select();
+    });
+    $('#copy-link-button').click(function () {
+        const input = $('#copy-link-input');
+        input.select();
+        document.execCommand('copy');
+        // $('#copy-link-modal').modal('hide');
+    });
+
+    $('#copy-game-modal').on('shown.bs.modal', function () {
+        $('#copy-game-textarea').select();
+        $(this).modal('handleUpdate');
+    });
+    $('#copy-game-textarea').click(function () {
+        $(this).select();
+    });
+    $('#copy-game-button').click(function () {
+        const input = $('#copy-game-input');
+        input.select();
+        document.execCommand('copy');
+        // $('#copy-game-modal').modal('hide');
     });
 
     initHome();
@@ -155,7 +131,7 @@ $(function () {
     }
 
     if (url.searchParams.has('load')) {
-        let toLoad = url.searchParams.get('load');
+        const toLoad = url.searchParams.get('load');
         if (toLoad === 'new') {
             loadNewGame();
         } else if (typeof toLoad === 'string' && toLoad.startsWith('{') && toLoad.endsWith('}')) {
@@ -169,19 +145,13 @@ function initHome() {
     const main = $('#main');
     main.empty();
 
-    const newGame = $('<button>').text('New Game').click(function () {
+    const newButton = $('<button>').text('New Game').click(function () {
         loadNewGame()
     });
+    const prevButton = $('<button>').text('Load Previous').attr('data-toggle', 'modal').attr('data-target', '#load-prev-modal');
+    const jsonButton = $('<button>').text('Load from JSON').attr('data-toggle', 'modal').attr('data-target', '#load-json-modal');
 
-    const loadPrevious = $('<button>').text('Load Previous').click(function () {
-        $('#load-prev-modal').dialog('open');
-    });
-
-    const loadJSON = $('<button>').text('Load from JSON').click(function () {
-        $('#json-input-modal').dialog('open');
-    });
-
-    main.append(newGame, loadPrevious, loadJSON);
+    main.append(newButton, prevButton, jsonButton);
 }
 
 
@@ -228,10 +198,7 @@ function displayGame() {
             const heroIndex = game.game[player];
             const row = $('<tr>');
             const dataName = $('<td>').text(player);
-            const dataHero = $('<td>').text(HEROES[heroIndex]).tooltip({
-                items: '*',
-                content: 'Hero: ' + heroIndex + '/' + LAST_HERO
-            });
+            const dataHero = $('<td>').text(HEROES[heroIndex]).tooltip({title: 'Hero: ' + heroIndex + '/' + LAST_HERO});
             const dataWinner = $('<td>');
             const radioWinner = $('<input>').attr('type', 'radio').attr('id', 'winner_' + player).attr('name', 'winner').prop('disabled', heroIndex === WINNER_INDEX).data('player', player).change(function () {
                 if (canGoToNextRound()) {
@@ -256,21 +223,15 @@ function displayGame() {
     const nextRoundButton = $('<button>').attr('id', 'next-round-button').text('Next round').prop('disabled', true).click(function () {
         nextRound();
     });
-    const addPlayerButton = $('<button>').text('Add Player').prop('disabled', game.players.length >= MAX_PLAYERS).click(function () {
-        $('#add-player-modal').dialog('open');
-    });
+    const addPlayerButton = $('<button>').text('Add Player').prop('disabled', game.players.length >= MAX_PLAYERS).attr('data-toggle', 'modal').attr('data-target', '#add-player-modal');
     const shareButton = $('<button>').text('Share game').click(function () {
-        const field = $('#url-export-field');
-        field.val(exportURL());
-        field.select();
-        $('#url-export-modal').dialog('open');
-        field.width(field.prop('scrollWidth'));
+        const input = $('#copy-link-input');
+        input.val(exportURL());
+        $('#copy-link-modal').modal('show');
     });
     const copyButton = $('<button>').text('Copy table').click(function () {
-        const field = $('#table-copy-field');
-        exportTable(game, field);
-        field.select();
-        $('#table-copy-modal').dialog('open');
+        exportTable(game, $('#copy-game-textarea'));
+        $('#copy-game-modal').modal('show');
     });
     buttonDiv.append(nextRoundButton, addPlayerButton, shareButton, copyButton);
 
@@ -278,10 +239,10 @@ function displayGame() {
 }
 
 function nextRound() {
-    let winner = $('input[name=winner]:checked').data('player');
-    let potg = $('input[name=potg]:checked').data('player');
+    const winner = $('input[name=winner]:checked').data('player');
+    const potg = $('input[name=potg]:checked').data('player');
 
-    if (typeof winner !== 'string' || winner.length === 0 || typeof  potg !== 'string' || potg.length === 0) {
+    if (!canGoToNextRound()) {
         console.log('Error: Cannot progress to next round with winner "' + winner + '" and PotG "' + potg + '"');
         return false;
     }
@@ -421,7 +382,7 @@ function exportGame() {
 }
 
 function exportURL() {
-    let savedGame = exportGame();
+    const savedGame = exportGame();
     const url = new URL(window.location.href);
     if (savedGame && typeof savedGame === 'string' && savedGame.length > 0) {
         url.searchParams.set('load', savedGame);
@@ -430,13 +391,14 @@ function exportURL() {
 }
 
 function getTooltip(game) {
-    let s = '';
+    let s = '<p style="text-align:left;">';
     if (game) {
         if (game.date) {
             s += 'Date: ' + game.date + '<br>';
         }
         s += 'Game:<br>' + exportTable(game.game);
     }
+    s += '</p>';
     return s;
 }
 
