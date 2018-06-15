@@ -1,3 +1,5 @@
+'use strict';
+
 const NAME = 'Name';
 const HERO = 'Hero';
 const WINNER = 'Winner';
@@ -40,14 +42,14 @@ const HEROES = [
 const LAST_HERO = HEROES.length - 1 - 1;
 const WINNER_INDEX = LAST_HERO + 1;
 
-var game;
+let game;
 
 $(function () {
-    var select = $('#load-prev-select');
-    var games = load();
+    let select = $('#load-prev-select');
+    const games = load();
 
     games.forEach(function (game_, i) {
-        var option = $('<option>').text(game_.date).attr('value', i).tooltip({
+        const option = $('<option>').text(game_.date).attr('value', i).tooltip({
             items: '*',
             content: getTooltip(game_)
         });
@@ -60,8 +62,8 @@ $(function () {
         title: 'Select previous game to load',
         buttons: {
             'Load': function () {
-                var s = $('#load-prev-select');
-                var gameIndex = parseInt(s.val());
+                const s = $('#load-prev-select');
+                const gameIndex = parseInt(s.val());
                 if (games && games[gameIndex] && games[gameIndex].game) {
                     loadGameFromJSON(games[gameIndex].game);
                     $(this).dialog('close');
@@ -75,7 +77,7 @@ $(function () {
         title: 'Paste the saved game as JSON',
         buttons: {
             'Load': function () {
-                var f = $('#json-input-field');
+                const f = $('#json-input-field');
                 if (loadGameFromJSONString(f.val())) {
                     $(this).dialog('close');
                     f.val('');
@@ -89,7 +91,7 @@ $(function () {
         title: 'Copy the exported game link',
         buttons: {
             'Copy': function () {
-                var f = $('#url-export-field');
+                const f = $('#url-export-field');
                 f.select();
                 document.execCommand('copy');
             }
@@ -104,7 +106,7 @@ $(function () {
         title: 'Copy the table',
         buttons: {
             'Copy': function () {
-                var f = $('#table-copy-field');
+                const f = $('#table-copy-field');
                 f.select();
                 document.execCommand('copy');
             }
@@ -116,7 +118,7 @@ $(function () {
 
     select = $('#add-player-select');
     HEROES.forEach(function (hero, i) {
-        var option = $('<option>').text(hero).attr('value', i);
+        const option = $('<option>').text(hero).attr('value', i);
         select.append(option);
     });
     $('#add-player-modal').dialog({
@@ -125,10 +127,10 @@ $(function () {
         title: 'Enter player name and hero',
         buttons: {
             'Add': function () {
-                var pF = $('#add-player-field');
-                var hF = $('#add-player-select');
-                var player = pF.val();
-                var heroIndex = parseInt(hF.val());
+                const pF = $('#add-player-field');
+                const hF = $('#add-player-select');
+                const player = pF.val();
+                const heroIndex = parseInt(hF.val());
                 if (addPlayer(player, heroIndex)) {
                     $(this).dialog('close');
                     pF.val('');
@@ -140,10 +142,10 @@ $(function () {
 
     initHome();
 
-    var url = new URL(window.location.href);
+    const url = new URL(window.location.href);
     if ((window.location.href.includes('localhost') || window.location.href.startsWith('file://')) && !url.searchParams.has('load')) {
-        var obj = {players: [], game: {}};
-        for (var i = 0; i < 12; i++) {
+        const obj = {players: [], game: {}};
+        for (let i = 0; i < 12; i++) {
             obj.players.push('player' + (i < 10 ? '0' : '') + i);
         }
         obj.players.forEach(function (player, i) {
@@ -153,7 +155,7 @@ $(function () {
     }
 
     if (url.searchParams.has('load')) {
-        var toLoad = url.searchParams.get('load');
+        let toLoad = url.searchParams.get('load');
         if (toLoad === 'new') {
             loadNewGame();
         } else if (typeof toLoad === 'string' && toLoad.startsWith('{') && toLoad.endsWith('}')) {
@@ -164,18 +166,18 @@ $(function () {
 
 function initHome() {
     game = undefined;
-    var main = $('#main');
+    const main = $('#main');
     main.empty();
 
-    var newGame = $('<button>').text('New Game').click(function () {
+    const newGame = $('<button>').text('New Game').click(function () {
         loadNewGame()
     });
 
-    var loadPrevious = $('<button>').text('Load Previous').click(function () {
+    const loadPrevious = $('<button>').text('Load Previous').click(function () {
         $('#load-prev-modal').dialog('open');
     });
 
-    var loadJSON = $('<button>').text('Load from JSON').click(function () {
+    const loadJSON = $('<button>').text('Load from JSON').click(function () {
         $('#json-input-modal').dialog('open');
     });
 
@@ -188,7 +190,7 @@ function loadNewGame() {
 }
 
 function loadGameFromJSONString(s) {
-    var json;
+    let json;
     try {
         json = JSON.parse(s);
     } catch (e) {
@@ -206,43 +208,43 @@ function loadGameFromJSON(json) {
 }
 
 function displayGame() {
-    var main = $('#main');
+    const main = $('#main');
     main.empty();
-    var tableDiv = $('<div>').addClass('table-container');
-    var table = $('<table>');
-    var headerRow = $('<tr>');
-    var headerName = $('<th>').text(NAME);
-    var headerHero = $('<th>').text(HERO);
-    var headerWinner = $('<th>').text(WINNER);
-    var headerPotG = $('<th>').text(POTG);
+    const tableDiv = $('<div>').addClass('table-container');
+    const table = $('<table>');
+    const headerRow = $('<tr>');
+    const headerName = $('<th>').text(NAME);
+    const headerHero = $('<th>').text(HERO);
+    const headerWinner = $('<th>').text(WINNER);
+    const headerPotG = $('<th>').text(POTG);
     headerRow.append(headerName, headerHero, headerWinner, headerPotG);
     table.append(headerRow);
     if (game) {
-        var players = game.players;
+        const players = game.players;
         players.sort(function (a, b) {
             return game.game[b] - game.game[a];
         });
         players.forEach(function (player) {
-            var heroIndex = game.game[player];
-            var row = $('<tr>');
-            var dataName = $('<td>').text(player);
-            var dataHero = $('<td>').text(HEROES[heroIndex]).tooltip({
+            const heroIndex = game.game[player];
+            const row = $('<tr>');
+            const dataName = $('<td>').text(player);
+            const dataHero = $('<td>').text(HEROES[heroIndex]).tooltip({
                 items: '*',
                 content: 'Hero: ' + heroIndex + '/' + LAST_HERO
             });
-            var dataWinner = $('<td>');
-            var radioWinner = $('<input>').attr('type', 'radio').attr('id', 'winner_' + player).attr('name', 'winner').prop('disabled', heroIndex === WINNER_INDEX).data('player', player).change(function () {
-                var winner = $('input[name=winner]:checked');
-                var potg = $('input[name=potg]:checked');
+            const dataWinner = $('<td>');
+            const radioWinner = $('<input>').attr('type', 'radio').attr('id', 'winner_' + player).attr('name', 'winner').prop('disabled', heroIndex === WINNER_INDEX).data('player', player).change(function () {
+                const winner = $('input[name=winner]:checked');
+                const potg = $('input[name=potg]:checked');
                 if (winner.length === 1 && game.game[winner.data('player')] !== WINNER_INDEX && potg.length === 1 && game.game[potg.data('player')] !== WINNER_INDEX) {
                     $('#next-round-button').prop('disabled', false);
                 }
             });
             dataWinner.append(radioWinner);
-            var dataPotG = $('<td>');
-            var radioPotG = $('<input>').attr('type', 'radio').attr('id', 'potg_' + player).attr('name', 'potg').prop('disabled', heroIndex === WINNER_INDEX).data('player', player).change(function () {
-                var winner = $('input[name=winner]:checked');
-                var potg = $('input[name=potg]:checked');
+            const dataPotG = $('<td>');
+            const radioPotG = $('<input>').attr('type', 'radio').attr('id', 'potg_' + player).attr('name', 'potg').prop('disabled', heroIndex === WINNER_INDEX).data('player', player).change(function () {
+                const winner = $('input[name=winner]:checked');
+                const potg = $('input[name=potg]:checked');
                 if (winner.length === 1 && game.game[winner.data('player')] !== WINNER_INDEX && potg.length === 1 && game.game[potg.data('player')] !== WINNER_INDEX) {
                     $('#next-round-button').prop('disabled', false);
                 }
@@ -254,22 +256,22 @@ function displayGame() {
     }
     tableDiv.append(table);
 
-    var buttonDiv = $('<div>').addClass('button-container');
-    var nextRoundButton = $('<button>').attr('id', 'next-round-button').text('Next round').prop('disabled', true).click(function () {
+    const buttonDiv = $('<div>').addClass('button-container');
+    const nextRoundButton = $('<button>').attr('id', 'next-round-button').text('Next round').prop('disabled', true).click(function () {
         nextRound();
     });
-    var addPlayerButton = $('<button>').text('Add Player').click(function () {
+    const addPlayerButton = $('<button>').text('Add Player').click(function () {
         $('#add-player-modal').dialog('open');
     });
-    var shareButton = $('<button>').text('Share game').click(function () {
-        var field = $('#url-export-field');
+    const shareButton = $('<button>').text('Share game').click(function () {
+        const field = $('#url-export-field');
         field.val(exportURL());
         field.select();
         $('#url-export-modal').dialog('open');
         field.width(field.prop('scrollWidth'));
     });
-    var copyButton = $('<button>').text('Copy table').click(function () {
-        var field = $('#table-copy-field');
+    const copyButton = $('<button>').text('Copy table').click(function () {
+        const field = $('#table-copy-field');
         exportTable(game, field);
         field.select();
         $('#table-copy-modal').dialog('open');
@@ -280,8 +282,8 @@ function displayGame() {
 }
 
 function nextRound() {
-    var winner = $('input[name=winner]:checked').data('player');
-    var potg = $('input[name=potg]:checked').data('player');
+    let winner = $('input[name=winner]:checked').data('player');
+    let potg = $('input[name=potg]:checked').data('player');
 
     if (typeof winner !== 'string' || winner.length === 0 || typeof  potg !== 'string' || potg.length === 0) {
         console.log('Error: Cannot progress to next round with winner "' + winner + '" and PotG "' + potg + '"');
@@ -289,10 +291,10 @@ function nextRound() {
     }
 
     game.players.forEach(function (player) {
-        var heroIndex = game.game[player];
+        let heroIndex = game.game[player];
         if (heroIndex <= LAST_HERO) {
-            var isWinner = player === winner;
-            var isPotG = player === potg;
+            const isWinner = player === winner;
+            const isPotG = player === potg;
             if (heroIndex === LAST_HERO) {
                 if (isWinner || isPotG) {
                     heroIndex = WINNER_INDEX;
@@ -335,9 +337,9 @@ function addPlayer(player, heroIndex) {
 }
 
 function sanitizeData(json) {
-    var data = {};
+    const data = {};
     if (json) {
-        var players = json.players;
+        let players = json.players;
         if (!players || !Array.isArray(players)) {
             console.log('Error: "players": "' + players + '" invalid');
             players = [];
@@ -355,14 +357,14 @@ function sanitizeData(json) {
         }
         data['players'] = players;
 
-        var game = {};
-        var gameJSON = json.game;
+        const game = {};
+        let gameJSON = json.game;
         if (!gameJSON || !(typeof gameJSON === 'object')) {
             console.log('Error: "game": "' + game + '" invalid');
             gameJSON = {};
         }
         players.forEach(function (player) {
-            var heroIndex = gameJSON[player];
+            let heroIndex = gameJSON[player];
             if (!(typeof heroIndex === 'number') || (heroIndex % 1) !== 0 || heroIndex < 0 || heroIndex >= HEROES.length) {
                 console.log('Error: "heroIndex": "' + heroIndex + '" for player "' + player + '" invalid');
                 game[player] = 0;
@@ -381,13 +383,13 @@ function sanitizeData(json) {
 
 function save() {
     if (game) {
-        var games = {games: [{date: new Date(), game: sanitizeData(game)}]};
-        var gamesJSON = Cookies.getJSON('games');
+        const games = {games: [{date: new Date(), game: sanitizeData(game)}]};
+        const gamesJSON = Cookies.getJSON('games');
         if (gamesJSON && Array.isArray(gamesJSON.games)) {
             gamesJSON.games.forEach(function (game_) {
                 if (game_.date && game_.game) {
-                    var date = new Date(game_.date);
-                    var game__ = sanitizeData(game_.game);
+                    const date = new Date(game_.date);
+                    const game__ = sanitizeData(game_.game);
                     if (game__.players.length > 0) {
                         games.games.push({date: date, game: game__});
                     }
@@ -399,13 +401,13 @@ function save() {
 }
 
 function load() {
-    var games = Cookies.getJSON('games');
-    var list = [];
+    const games = Cookies.getJSON('games');
+    const list = [];
     if (games && Array.isArray(games.games)) {
         games.games.forEach(function (game_) {
             if (game_.date && game_.game) {
-                var date = new Date(game_.date);
-                var game__ = sanitizeData(game_.game);
+                const date = new Date(game_.date);
+                const game__ = sanitizeData(game_.game);
                 if (game__.players.length > 0) {
                     list.push({date: date, game: game__});
                 }
@@ -423,8 +425,8 @@ function exportGame() {
 }
 
 function exportURL() {
-    var savedGame = exportGame();
-    var url = new URL(window.location.href);
+    let savedGame = exportGame();
+    const url = new URL(window.location.href);
     if (savedGame && typeof savedGame === 'string' && savedGame.length > 0) {
         url.searchParams.set('load', savedGame);
     }
@@ -432,7 +434,7 @@ function exportURL() {
 }
 
 function getTooltip(game) {
-    var s = '';
+    let s = '';
     if (game) {
         if (game.date) {
             s += 'Date: ' + game.date + '<br>';
@@ -444,13 +446,13 @@ function getTooltip(game) {
 
 function exportTable(game, textarea) {
     game = sanitizeData(game);
-    var text = '';
-    var rows = 1;
-    var cols = 1;
+    let text = '';
+    let rows = 1;
+    let cols = 1;
     game.players.forEach(function (player) {
-        var heroIndex = game.game[player];
-        var line = player + ': ' + HEROES[heroIndex] + ' (' + heroIndex + '/' + LAST_HERO + ')';
-        var length = line.length;
+        const heroIndex = game.game[player];
+        const line = player + ': ' + HEROES[heroIndex] + ' (' + heroIndex + '/' + LAST_HERO + ')';
+        const length = line.length;
         if (length > cols) {
             cols = length;
         }
