@@ -226,7 +226,10 @@ function displayGame() {
             var heroIndex = game.game[player];
             var row = $('<tr>');
             var dataName = $('<td>').text(player);
-            var dataHero = $('<td>').text(HEROES[heroIndex]);
+            var dataHero = $('<td>').text(HEROES[heroIndex]).tooltip({
+                items: '*',
+                content: 'Hero: ' + heroIndex + '/' + LAST_HERO
+            });
             var dataWinner = $('<td>');
             var radioWinner = $('<input>').attr('type', 'radio').attr('id', 'winner_' + player).attr('name', 'winner').prop('disabled', heroIndex === WINNER_INDEX).data('player', player).change(function () {
                 var winner = $('input[name=winner]:checked');
