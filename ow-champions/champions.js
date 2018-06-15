@@ -394,7 +394,7 @@ function save() {
                 }
             })
         }
-        Cookies.set('games', games, {expires: new Date(Number.MAX_VALUE)});
+        Cookies.set('games', games, {expires: new Date(Date.now() + 10 * 365 * 24 * 60 * 60 * 1000)});
     }
 }
 
