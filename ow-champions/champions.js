@@ -1,11 +1,5 @@
 'use strict';
 
-const NAME = 'Name';
-const HERO = 'Hero';
-const WINNER = 'Winner';
-const POTG = 'PotG';
-const EDIT = 'Edit/Delete';
-
 const EMPTY_GAME = {players: [], game: {}};
 
 const MAX_PLAYERS = 12;
@@ -40,8 +34,8 @@ const HEROES = [
     'Zenyatta',
     'WINNER'
 ];
-const LAST_HERO = HEROES.length - 1 - 1;
-const WINNER_INDEX = LAST_HERO + 1;
+const WINNER_INDEX = HEROES.length - 1;
+const LAST_HERO = WINNER_INDEX - 1;
 
 let game;
 
@@ -50,7 +44,7 @@ $(function () {
 
     let select = $('#load-prev-select');
     games.forEach(function (game_, i) {
-        select.append($('<option>').text(game_.date).attr('value', i).tooltip({
+        select.append($('<option>').text('' + game_.date).attr('value', i).tooltip({
             html: true,
             title: getTooltip(game_)
         }));
@@ -64,7 +58,7 @@ $(function () {
         const select = $('#load-prev-select');
         const gameIndex = parseInt(select.val());
         if (games && gameIndex && games[gameIndex] && games[gameIndex].game) {
-            loadGameFromJSON(games[gameIndex].game);
+            loadGame(games[gameIndex].game);
             $('#load-prev-modal').modal('hide');
             select.val('0');
         }
@@ -108,7 +102,7 @@ $(function () {
         }
     });
 
-    $('#copy-link-modal').on('shown.bs.modal', function (e) {
+    $('#copy-link-modal').on('shown.bs.modal', function () {
         const input = $('#copy-link-input');
         input.width(input.prop('scrollWidth')).select();
         $(this).modal('handleUpdate');
@@ -177,22 +171,22 @@ function initHome() {
 
 
 function loadNewGame() {
-    loadGameFromJSON(EMPTY_GAME);
+    loadGame(EMPTY_GAME);
 }
 
-function loadGameFromJSONString(s) {
-    let json;
+function loadGameFromJSONString(jsonString) {
+    let game_;
     try {
-        json = JSON.parse(s);
+        game_ = JSON.parse(jsonString);
     } catch (e) {
         return false;
     }
-    loadGameFromJSON(json);
+    loadGame(game_);
     return true;
 }
 
-function loadGameFromJSON(json) {
-    game = sanitizeData(json);
+function loadGame(game_) {
+    game = sanitizeData(game_);
     save();
 
     displayGame();
@@ -204,11 +198,11 @@ function displayGame() {
     const tableDiv = $('<div>').addClass('table-container');
     const table = $('<table>');
     const headerRow = $('<tr>');
-    const headerName = $('<th>').text(NAME);
-    const headerHero = $('<th>').text(HERO);
-    const headerWinner = $('<th>').text(WINNER);
-    const headerPotG = $('<th>').text(POTG);
-    const headerEdit = $('<th>').text(EDIT);
+    const headerName = $('<th>').text('Name');
+    const headerHero = $('<th>').text('Hero');
+    const headerWinner = $('<th>').text('Winner');
+    const headerPotG = $('<th>').text('PotG');
+    const headerEdit = $('<th>').text('Edit/Delete');
     headerRow.append(headerName, headerHero, headerWinner, headerPotG, headerEdit);
     table.append(headerRow);
     if (game) {
@@ -530,5 +524,5 @@ function exportTable(game, textarea) {
 function canGoToNextRound() {
     const winner = $('input[name=winner]:checked');
     const potg = $('input[name=potg]:checked');
-    return winner.length === 1 && game.game[winner.data('player')] !== WINNER_INDEX && potg.length === 1 && game.game[potg.data('player')] !== WINNER_INDEX
+    return winner.length === 1 && game.game[winner.data('player')] !== WINNER_INDEX && potg.length === 1 && game.game[potg.data('player')] !== WINNER_INDEX;
 }
