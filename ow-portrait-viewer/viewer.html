@@ -59,6 +59,15 @@
             padding: 16px;
         }
 
+        #endorsement-form label {
+            display: inline-block;
+            width: 100px;
+        }
+
+        #endorsement-form select, input {
+            display: inline-block;
+        }
+
         .endorsement-level {
             box-sizing: border-box;
             -moz-box-sizing: border-box;
@@ -205,17 +214,31 @@
 <hr>
 <div id="endorsements">
     <div id="endorsement-generator-form">
+        <label for="endorsement-form">Endorsement Generator</label>
         <form id="endorsement-form">
-            <select name="level" id="endorsement-form-level">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-            </select>
-            <input name="shotcaller" id="endorsement-form-shotcaller" type="number" step="0.01" min="0" required>
-            <input name="teammate" id="endorsement-form-teammate" type="number" step="0.01" min="0" required>
-            <input name="sportsmanship" id="endorsement-form-sportsmanship" type="number" step="0.01" min="0" required>
+            <p>
+                <label for="endorsement-form-level">Level: </label>
+                <select name="level" id="endorsement-form-level">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </p>
+            <p>
+                <label for="endorsement-form-shotcaller">Shotcaller: </label>
+                <input name="shotcaller" id="endorsement-form-shotcaller" type="number" step="0.01" min="0" required>
+            </p>
+            <p>
+                <label for="endorsement-form-teammate">Teammate: </label>
+                <input name="teammate" id="endorsement-form-teammate" type="number" step="0.01" min="0" required>
+            </p>
+            <p>
+                <label for="endorsement-form-sportsmanship">Sportsmanship: </label>
+                <input name="sportsmanship" id="endorsement-form-sportsmanship" type="number" step="0.01" min="0"
+                       required>
+            </p>
             <input type="submit">
         </form>
     </div>
@@ -307,26 +330,36 @@
                                     backgroundSvg.appendChild(circle.cloneNode(false));
                                     endorsementIconInnerDiv.appendChild(backgroundSvg);
 
-                                    var shotcallerSvg = document.createElementNS(SVG, "svg");
-                                    shotcallerSvg.setAttributeNS(null, "class", "endorsement-border endorsement-border-shotcaller");
-                                    shotcallerSvg.setAttributeNS(null, "viewBox", "0 0 36 36");
-                                    shotcallerSvg.setAttributeNS(null, "style", "stroke-dasharray: " + Math.max(0, (CIRCUMFERENCE * shotcallerF / totalF) - 1) + ", " + CIRCUMFERENCE + "; transform: rotate(360deg)");
-                                    shotcallerSvg.appendChild(circle.cloneNode(false));
-                                    endorsementIconInnerDiv.appendChild(shotcallerSvg);
+                                    var padding = ((shotcallerF > 0 && teammateF === 0 && sportsmanshipF === 0) ||
+                                        (sportsmanshipF > 0 && shotcallerF === 0 && teammateF === 0) ||
+                                        (teammateF > 0 && sportsmanshipF === 0 && shotcallerF === 0)) ? 1 : 0;
 
-                                    var teammateSvg = document.createElementNS(SVG, "svg");
-                                    teammateSvg.setAttributeNS(null, "class", "endorsement-border endorsement-border-teammate");
-                                    teammateSvg.setAttributeNS(null, "viewBox", "0 0 36 36");
-                                    teammateSvg.setAttributeNS(null, "style", "stroke-dasharray: " + Math.max(0, (CIRCUMFERENCE * teammateF / totalF) - 1) + ", " + CIRCUMFERENCE + "; transform: rotate(" + (360 * (1 + (shotcallerF / totalF))) + "deg)");
-                                    teammateSvg.appendChild(circle.cloneNode(false));
-                                    endorsementIconInnerDiv.appendChild(teammateSvg);
+                                    if (shotcallerF > 0) {
+                                        var shotcallerSvg = document.createElementNS(SVG, "svg");
+                                        shotcallerSvg.setAttributeNS(null, "class", "endorsement-border endorsement-border-shotcaller");
+                                        shotcallerSvg.setAttributeNS(null, "viewBox", "0 0 36 36");
+                                        shotcallerSvg.setAttributeNS(null, "style", "stroke-dasharray: " + Math.max(0, (CIRCUMFERENCE * shotcallerF / totalF) - padding) + ", " + CIRCUMFERENCE + "; transform: rotate(360deg)");
+                                        shotcallerSvg.appendChild(circle.cloneNode(false));
+                                        endorsementIconInnerDiv.appendChild(shotcallerSvg);
+                                    }
 
-                                    var sportsmanshipSvg = document.createElementNS(SVG, "svg");
-                                    sportsmanshipSvg.setAttributeNS(null, "class", "endorsement-border endorsement-border-sportsmanship");
-                                    sportsmanshipSvg.setAttributeNS(null, "viewBox", "0 0 36 36");
-                                    sportsmanshipSvg.setAttributeNS(null, "style", "stroke-dasharray: " + Math.max(0, (CIRCUMFERENCE * sportsmanshipF / totalF) - 1) + ", " + CIRCUMFERENCE + "; transform: rotate(" + (360 * (1 + ((shotcallerF + teammateF) / totalF))) + "deg)");
-                                    sportsmanshipSvg.appendChild(circle.cloneNode(false));
-                                    endorsementIconInnerDiv.appendChild(sportsmanshipSvg);
+                                    if (teammateF > 0) {
+                                        var teammateSvg = document.createElementNS(SVG, "svg");
+                                        teammateSvg.setAttributeNS(null, "class", "endorsement-border endorsement-border-teammate");
+                                        teammateSvg.setAttributeNS(null, "viewBox", "0 0 36 36");
+                                        teammateSvg.setAttributeNS(null, "style", "stroke-dasharray: " + Math.max(0, (CIRCUMFERENCE * teammateF / totalF) - padding) + ", " + CIRCUMFERENCE + "; transform: rotate(" + (360 * (1 + (shotcallerF / totalF))) + "deg)");
+                                        teammateSvg.appendChild(circle.cloneNode(false));
+                                        endorsementIconInnerDiv.appendChild(teammateSvg);
+                                    }
+
+                                    if (sportsmanshipF > 0) {
+                                        var sportsmanshipSvg = document.createElementNS(SVG, "svg");
+                                        sportsmanshipSvg.setAttributeNS(null, "class", "endorsement-border endorsement-border-sportsmanship");
+                                        sportsmanshipSvg.setAttributeNS(null, "viewBox", "0 0 36 36");
+                                        sportsmanshipSvg.setAttributeNS(null, "style", "stroke-dasharray: " + Math.max(0, (CIRCUMFERENCE * sportsmanshipF / totalF) - padding) + ", " + CIRCUMFERENCE + "; transform: rotate(" + (360 * (1 + ((shotcallerF + teammateF) / totalF))) + "deg)");
+                                        sportsmanshipSvg.appendChild(circle.cloneNode(false));
+                                        endorsementIconInnerDiv.appendChild(sportsmanshipSvg);
+                                    }
                                 }
                                 endorsementIconDiv.appendChild(endorsementIconInnerDiv);
                             }
