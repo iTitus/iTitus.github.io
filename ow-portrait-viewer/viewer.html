@@ -3,6 +3,15 @@
 <head>
     <title>OW Portait Viewer</title>
     <style>
+
+        html {
+            font-size: 10px;
+        }
+
+        body {
+            font-size: 16px;
+        }
+
         /*
         img {
           width: 256px;
@@ -12,6 +21,7 @@
           border-radius: 4px;
         }
         */
+
         .img-container {
             width: 256px;
             height: 256px;
@@ -44,16 +54,182 @@
         .portrait-label {
             margin-left: 10px;
         }
+
+        .endorsement {
+            padding: 16px;
+        }
+
+        .endorsement-level {
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            background-color: #505050;
+            position: relative;
+            display: inline-block;
+            width: 120px;
+            height: 120px;
+            font-family: "FuturaNo2D", "century gothic", arial, sans-serif;
+            font-weight: 600;
+            font-size: 2rem;
+            text-align: center;
+            color: #F6F6F6;
+            padding: 12px;
+            vertical-align: middle;
+            -webkit-animation: fadein 2s;
+            -moz-animation: fadein 2s;
+            -ms-animation: fadein 2s;
+            -o-animation: fadein 2s;
+            animation: fadein 2s;
+        }
+
+        .endorsement-level-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            -webkit-transform: translateX(-50%) translateY(-50%);
+            -moz-transform: translateX(-50%) translateY(-50%);
+            -ms-transform: translateX(-50%) translateY(-50%);
+            -o-transform: translateX(-50%) translateY(-50%);
+            transform: translateX(-50%) translateY(-50%);
+        }
+
+        .endorsement-icon {
+            width: 100%;
+            height: 100%;
+        }
+
+        .endorsement-icon-inner {
+            position: relative;
+            width: 50%;
+            height: 50%;
+            top: 50%;
+            left: 50%;
+            -webkit-transform: translate(-50%, -50%) rotate(-90deg);
+            -moz-transform: translate(-50%, -50%) rotate(-90deg);
+            -ms-transform: translate(-50%, -50%) rotate(-90deg);
+            -o-transform: translate(-50%, -50%) rotate(-90deg);
+            transform: translate(-50%, -50%) rotate(-90deg);
+        }
+
+        .endorsement-background {
+            position: absolute;
+            display: block;
+            width: 110%;
+            height: 110%;
+            top: -5%;
+            left: -5%;
+            fill: #2A2B2E;
+            stroke: none;
+        }
+
+        .endorsement-border {
+            position: absolute;
+            display: block;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            fill: none;
+            stroke-width: 1px;
+            /*
+            stroke-dasharray: 0, 100;
+            -moz-transition: stroke-dasharray 1s linear, -moz-transform 1s linear;
+            -ms-transition: stroke-dasharray 1s linear, -ms-transform 1s linear;
+            -o-transition: stroke-dasharray 1s linear, -o-transform 1s linear;
+            -webkit-transition: stroke-dasharray 1s linear, -webkit-transform 1s linear;
+            transition: transform 1s linear, stroke-dasharray 1s linear, -webkit-transform 1s linear;
+            */
+        }
+
+        .endorsement-border-shotcaller {
+            stroke: #F19512;
+        }
+
+        .endorsement-border-sportsmanship {
+            stroke: #40CE44;
+        }
+
+        .endorsement-border-teammate {
+            stroke: #C81AF5;
+        }
+
+        @keyframes fadein {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @-moz-keyframes fadein {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @-webkit-keyframes fadein {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @-ms-keyframes fadein {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @-o-keyframes fadein {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
     </style>
 </head>
 <body>
 <p><a href="../index.html">Go back</a></p>
 <hr>
-<div id="images"></div>
+<div id="endorsements">
+    <div id="endorsement-generator-form">
+        <form id="endorsement-form">
+            <select name="level" id="endorsement-form-level">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+            <input name="shotcaller" id="endorsement-form-shotcaller" type="number" step="0.01" min="0" required>
+            <input name="teammate" id="endorsement-form-teammate" type="number" step="0.01" min="0" required>
+            <input name="sportsmanship" id="endorsement-form-sportsmanship" type="number" step="0.01" min="0" required>
+            <input type="submit">
+        </form>
+    </div>
+    <div id="endorsement" class="endorsement"></div>
+</div>
+<hr>
+<div id="portraits"></div>
 
 <script>
+    var SVG = "http://www.w3.org/2000/svg";
+    var CIRCUMFERENCE = 100;
+
     window.onload = function () {
-        var parent = document.getElementById("images");
+        var parent = document.getElementById("portraits");
         var start_string = "0x0250000000000";
         var start = 0x918; //0x922;
         var end = 0x9d0; //0x9cd
@@ -88,7 +264,83 @@
             div_element.appendChild(label_element);
 
             parent.appendChild(div_element);
+        }
 
+        var endorsementForm = document.getElementById("endorsement-form");
+        endorsementForm.onsubmit = function (e) {
+            e.preventDefault();
+
+            var level = document.getElementById("endorsement-form-level").value;
+            var shotcaller = document.getElementById("endorsement-form-shotcaller").value;
+            var teammate = document.getElementById("endorsement-form-teammate").value;
+            var sportsmanship = document.getElementById("endorsement-form-sportsmanship").value;
+
+            if (level && shotcaller && teammate && sportsmanship) {
+                level = parseInt(level);
+                var shotcallerF = parseFloat(shotcaller);
+                var teammateF = parseFloat(teammate);
+                var sportsmanshipF = parseFloat(sportsmanship);
+                var totalF = shotcallerF + teammateF + sportsmanshipF;
+
+                if (level && level > 0 && level <= 5 && shotcallerF >= 0 && teammateF >= 0 && sportsmanshipF >= 0 && totalF > 0) {
+                    var endorsementDiv = document.getElementById("endorsement");
+                    endorsementDiv.innerHTML = '';
+                    {
+                        var endorsementLevelDiv = document.createElement("div");
+                        endorsementLevelDiv.className = "endorsement-level";
+                        {
+                            var endorsementIconDiv = document.createElement("div");
+                            endorsementIconDiv.style = "background-image:url(https://d3hmvhl7ru3t12.cloudfront.net/svg/icons/endorsement-frames-be58f32488898c106f2ad8b1c3012dbce42d19b758c4b18bf2afbe91fc8f1d2cc83a0de433321792ff0fb3a1f66d37ded31598bd538838b30fa4537db617926e.svg#_" + level + ")";
+                            endorsementIconDiv.className = "endorsement-icon";
+                            {
+                                var endorsementIconInnerDiv = document.createElement("div");
+                                endorsementIconInnerDiv.className = "endorsement-icon-inner";
+                                {
+                                    var circle = document.createElementNS(SVG, "circle");
+                                    circle.setAttributeNS(null, "cx", "50%");
+                                    circle.setAttributeNS(null, "cy", "50%");
+                                    circle.setAttributeNS(null, "r", (CIRCUMFERENCE / (2 * Math.PI)).toString());
+
+                                    var backgroundSvg = document.createElementNS(SVG, "svg");
+                                    backgroundSvg.setAttributeNS(null, "class", "endorsement-background");
+                                    backgroundSvg.setAttributeNS(null, "viewBox", "0 0 36 36");
+                                    backgroundSvg.appendChild(circle.cloneNode(false));
+                                    endorsementIconInnerDiv.appendChild(backgroundSvg);
+
+                                    var shotcallerSvg = document.createElementNS(SVG, "svg");
+                                    shotcallerSvg.setAttributeNS(null, "class", "endorsement-border endorsement-border-shotcaller");
+                                    shotcallerSvg.setAttributeNS(null, "viewBox", "0 0 36 36");
+                                    shotcallerSvg.setAttributeNS(null, "style", "stroke-dasharray: " + Math.max(0, (CIRCUMFERENCE * shotcallerF / totalF) - 1) + ", " + CIRCUMFERENCE + "; transform: rotate(360deg)");
+                                    shotcallerSvg.appendChild(circle.cloneNode(false));
+                                    endorsementIconInnerDiv.appendChild(shotcallerSvg);
+
+                                    var teammateSvg = document.createElementNS(SVG, "svg");
+                                    teammateSvg.setAttributeNS(null, "class", "endorsement-border endorsement-border-teammate");
+                                    teammateSvg.setAttributeNS(null, "viewBox", "0 0 36 36");
+                                    teammateSvg.setAttributeNS(null, "style", "stroke-dasharray: " + Math.max(0, (CIRCUMFERENCE * teammateF / totalF) - 1) + ", " + CIRCUMFERENCE + "; transform: rotate(" + (360 * (1 + (shotcallerF / totalF))) + "deg)");
+                                    teammateSvg.appendChild(circle.cloneNode(false));
+                                    endorsementIconInnerDiv.appendChild(teammateSvg);
+
+                                    var sportsmanshipSvg = document.createElementNS(SVG, "svg");
+                                    sportsmanshipSvg.setAttributeNS(null, "class", "endorsement-border endorsement-border-sportsmanship");
+                                    sportsmanshipSvg.setAttributeNS(null, "viewBox", "0 0 36 36");
+                                    sportsmanshipSvg.setAttributeNS(null, "style", "stroke-dasharray: " + Math.max(0, (CIRCUMFERENCE * sportsmanshipF / totalF) - 1) + ", " + CIRCUMFERENCE + "; transform: rotate(" + (360 * (1 + ((shotcallerF + teammateF) / totalF))) + "deg)");
+                                    sportsmanshipSvg.appendChild(circle.cloneNode(false));
+                                    endorsementIconInnerDiv.appendChild(sportsmanshipSvg);
+                                }
+                                endorsementIconDiv.appendChild(endorsementIconInnerDiv);
+                            }
+                            endorsementLevelDiv.appendChild(endorsementIconDiv);
+
+                            var endorsementLevelTextDiv = document.createElement("div");
+                            endorsementLevelTextDiv.className = "endorsement-level-text";
+                            endorsementLevelTextDiv.innerText = level.toString();
+                            endorsementLevelDiv.appendChild(endorsementLevelTextDiv);
+                        }
+                        endorsementDiv.appendChild(endorsementLevelDiv);
+                    }
+                }
+            }
         }
     }
     /*
