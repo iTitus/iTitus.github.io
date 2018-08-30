@@ -4,6 +4,13 @@ const EMPTY_GAME = {players: [], game: {}};
 
 const MAX_PLAYERS = 12;
 const HEROES = [
+    'D.Va',
+    'Orisa',
+    'Reinhardt',
+    'Roadhog',
+    'Winston',
+    'Wrecking Ball',
+    'Zarya',
     'Bastion',
     'Doomfist',
     'Genji',
@@ -19,13 +26,6 @@ const HEROES = [
     'Torbjörn',
     'Tracer',
     'Widowmaker',
-    'D.Va',
-    'Orisa',
-    'Reinhardt',
-    'Roadhog',
-    'Winston',
-    'Wrecking Ball',
-    'Zarya',
     'Ana',
     'Brigitte',
     'Lúcio',
