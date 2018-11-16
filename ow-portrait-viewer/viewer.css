@@ -1,0 +1,207 @@
+html {
+    font-size: 10px;
+}
+
+body {
+    font-size: 16px;
+}
+
+/*
+img {
+  width: 256px;
+  height: 256px;
+  background: url(loading.gif) 50% no-repeat;
+  border: 1px solid black;
+  border-radius: 4px;
+}
+*/
+
+.img-container {
+    width: 256px;
+    height: 256px;
+    position: relative;
+}
+
+.img-bottom {
+    position: relative;
+    bottom: 10%;
+    left: 0;
+}
+
+.img-top {
+    position: absolute;
+    bottom: 6%;
+    width: 100%;
+    height: 50%;
+    z-index: 1;
+}
+
+.portrait {
+    width: 258px;
+    height: 281px;
+    float: left;
+    margin: 2px;
+    border: 1px solid black;
+    border-radius: 4px;
+}
+
+.portrait-label {
+    margin-left: 10px;
+}
+
+.endorsement {
+    padding: 16px;
+}
+
+#endorsement-form label {
+    display: inline-block;
+    width: 100px;
+}
+
+#endorsement-form select, input {
+    display: inline-block;
+}
+
+.endorsement-level {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    background-color: #505050;
+    position: relative;
+    display: inline-block;
+    width: 120px;
+    height: 120px;
+    font-family: "FuturaNo2D", "century gothic", arial, sans-serif;
+    font-weight: 600;
+    font-size: 2rem;
+    text-align: center;
+    color: #F6F6F6;
+    padding: 12px;
+    vertical-align: middle;
+    -webkit-animation: fadein 2s;
+    -moz-animation: fadein 2s;
+    -ms-animation: fadein 2s;
+    -o-animation: fadein 2s;
+    animation: fadein 2s;
+}
+
+.endorsement-level-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    -moz-transform: translateX(-50%) translateY(-50%);
+    -ms-transform: translateX(-50%) translateY(-50%);
+    -o-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+}
+
+.endorsement-icon {
+    width: 100%;
+    height: 100%;
+}
+
+.endorsement-icon-inner {
+    position: relative;
+    width: 50%;
+    height: 50%;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%) rotate(-90deg);
+    -moz-transform: translate(-50%, -50%) rotate(-90deg);
+    -ms-transform: translate(-50%, -50%) rotate(-90deg);
+    -o-transform: translate(-50%, -50%) rotate(-90deg);
+    transform: translate(-50%, -50%) rotate(-90deg);
+}
+
+.endorsement-background {
+    position: absolute;
+    display: block;
+    width: 110%;
+    height: 110%;
+    top: -5%;
+    left: -5%;
+    fill: #2A2B2E;
+    stroke: none;
+}
+
+.endorsement-border {
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    fill: none;
+    stroke-width: 1px;
+    /*
+    stroke-dasharray: 0, 100;
+    -moz-transition: stroke-dasharray 1s linear, -moz-transform 1s linear;
+    -ms-transition: stroke-dasharray 1s linear, -ms-transform 1s linear;
+    -o-transition: stroke-dasharray 1s linear, -o-transform 1s linear;
+    -webkit-transition: stroke-dasharray 1s linear, -webkit-transform 1s linear;
+    transition: transform 1s linear, stroke-dasharray 1s linear, -webkit-transform 1s linear;
+    */
+}
+
+.endorsement-border-shotcaller {
+    stroke: #F19512;
+}
+
+.endorsement-border-sportsmanship {
+    stroke: #40CE44;
+}
+
+.endorsement-border-teammate {
+    stroke: #C81AF5;
+}
+
+@font-face {
+    font-family: "FuturaNo2D";
+    src: url("https://d3hmvhl7ru3t12.cloudfront.net/fonts/FuturaNo2D-DemiBold-6bcaf79a95daaac7cb0a86449fa6c6f0d6dd222878eef52c61f7ed10037631c8b6ca8442408276e82b04d1a4bf6db3e18bca760ac182a81d08cbf7924e1dfb4b.woff");
+}
+
+@keyframes fadein {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@-moz-keyframes fadein {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes fadein {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@-ms-keyframes fadein {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@-o-keyframes fadein {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
