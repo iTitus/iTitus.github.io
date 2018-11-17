@@ -19,7 +19,7 @@
         <form id="endorsement-form">
             <p>
                 <label for="endorsement-form-level">Level: </label>
-                <select name="level" id="endorsement-form-level">
+                <select name="endorsement-level" id="endorsement-form-level">
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
@@ -48,7 +48,23 @@
 
 <hr>
 
-<div id="portraits"></div>
+<div id="portraits">
+    <div id="portrait-generator-form">
+        <label for="portrait-form">Portrait Generator</label>
+        <form id="portrait-form">
+            <p>
+                <label for="portrait-form-level">Level: </label>
+                <input name="level" id="portrait-form-level" type="number" min="1" max="6000" required>
+            </p>
+            <input type="submit">
+        </form>
+    </div>
+    <div id="portrait" class="portrait"></div>
+</div>
+
+<hr>
+
+<div id="portrait-viewer"></div>
 
 </body>
 </html>
