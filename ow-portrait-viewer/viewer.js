@@ -6,40 +6,46 @@ const BORDER_TYPES = ["bronze", "silver", "gold", "platinum", "diamond"];
 
 $(function () {
     const parent = $("#portrait-viewer");
-    const start_string = "0x0250000000000";
-    const start = 0x918; //0x922;
-    const end = 0x9d0; //0x9cd
-    for (let i = start; i <= end; i++) {
-        const hex_string = start_string + i.toString(16).toUpperCase();
 
-        const div_element = $("<div>", {
-            "id": hex_string,
-            "class": "portrait-box"
-        });
-        {
-            const div_img_container = $("<div>", {
-                id: "img-container:" + hex_string,
-                class: "img-container"
-            });
-            {
-                $("<img>", {
-                    class: "img-top",
-                    src: "https://blzgdapipro-a.akamaihd.net/game/playerlevelrewards/" + hex_string + "_Rank.png"
-                }).appendTo(div_img_container);
+    for (let border_type_index = 0; border_type_index < BORDER_TYPES.length; border_type_index++) {
+        for (let stars_index = 0; stars_index <= 5; stars_index++) {
+            for (let border_index = 0; border_index <= 9; border_index++) {
+                const level = 600 * border_type_index + 100 * stars_index + 10 * border_index + 1;
+                const div_element = $("<div>", {
+                    "class": "portrait-box"
+                });
+                {
+                    const div_img_container = $("<div>", {
+                        id: "img-container:" + level,
+                        class: "img-container"
+                    })
+                    {
+                        if (stars_index > 0) {
+                            $("<img>", {
+                                class: "img-top",
+                                src: "img/portraits/" + BORDER_TYPES[border_type_index] + "/stars_" + stars_index + ".png"
+                            }).appendTo(div_img_container);
+                        }
 
-                $("<img>", {
-                    class: "img-bottom",
-                    src: "https://blzgdapipro-a.akamaihd.net/game/playerlevelrewards/" + hex_string + "_Border.png"
-                }).appendTo(div_img_container);
+                        $("<img>", {
+                            class: "img-bottom",
+                            src: "img/portraits/" + BORDER_TYPES[border_type_index] + "/border_" + border_index + ".png"
+                        }).appendTo(div_img_container);
+
+                        /*$("<div>", {
+                            class: "img-level-text"
+                        }).text(level).appendTo(div_img_container);*/
+                    }
+                    div_element.append(div_img_container);
+
+                    $("<label>", {
+                        class: "portrait-label",
+                        for: "img-container:" + level
+                    }).text(level + " - " + (level + 9)).appendTo(div_element);
+                }
+                parent.append(div_element);
             }
-            div_element.append(div_img_container);
-
-            $("<label>", {
-                class: "portrait-label",
-                for: "img-container:" + hex_string
-            }).text(hex_string).appendTo(div_element);
         }
-        parent.append(div_element);
     }
 
     const endorsementForm = $("#endorsement-form");

@@ -36,6 +36,21 @@ img {
     z-index: 1;
 }
 
+.img-level-text {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.portrait-viewer {
+    vertical-align: middle;
+    font-family: "FuturaNo2D", "century gothic", arial, sans-serif;
+    font-weight: 600;
+    font-size: 2rem;
+    text-align: center;
+    color: #F6F6F6;
+}
+
 .portrait-box {
     width: 258px;
     height: 281px;
@@ -43,6 +58,7 @@ img {
     margin: 2px;
     border: 1px solid black;
     border-radius: 4px;
+    background-color: #505050;
 }
 
 .portrait-label {
