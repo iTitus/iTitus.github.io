@@ -188,7 +188,7 @@ function getBorderIndex(level) {
 }
 
 function getStarsIndex(level) {
-    if (level > 5900) {
+    if (level > 2900) {
         return 5;
     }
     return Math.floor(((level - 1) % 600) / 100);
