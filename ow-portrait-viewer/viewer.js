@@ -2,6 +2,7 @@
 
 const SVG = "http://www.w3.org/2000/svg";
 const CIRCUMFERENCE = 100;
+const BORDER_TYPES = ["bronze", "silver", "gold", "platinum", "diamond"];
 
 $(function () {
     const parent = $("#portrait-viewer");
@@ -130,7 +131,7 @@ $(function () {
     const portraitForm = $("#portrait-form");
     portraitForm.submit(function (e) {
         const level = parseInt($("#portrait-form-level").val());
-        if (isNaN(level)) {
+        if (isNaN(level) || level <= 0 || level > 3000) {
             return false;
         }
 
@@ -170,17 +171,7 @@ $(function () {
 });
 
 function getBorderType(level) {
-    const border_type = (level - 1) / 600;
-    if (border_type < 1) {
-        return "bronze";
-    } else if (border_type < 2) {
-        return "silver";
-    } else if (border_type < 3) {
-        return "gold";
-    } else if (border_type < 4) {
-        return "platinum";
-    }
-    return "diamond";
+    return BORDER_TYPES[Math.floor((level - 1) / 600)];
 }
 
 function getBorderIndex(level) {
