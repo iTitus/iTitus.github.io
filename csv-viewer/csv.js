@@ -17,7 +17,7 @@ $(function () {
             return false;
         }
         e.preventDefault();
-        
+
         fileInput.parse({
             config: CONFIG,
             before: function (file, inputElem) {
