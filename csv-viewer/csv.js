@@ -42,16 +42,13 @@ $(function () {
 
 function stepFn(results) {
     // console.log("Step:", results);
-    const data = results.data;
-    for (let i = 0; i < data.length; i++) {
-        const row = data[i];
+    const row = results.data;
 
-        const tr = $("<tr>");
-        for (let j = 0; j < row.length; j++) {
-            $(tableEmpty ? "<th>" : "<td>").text(row[j]).appendTo(tr);
-        }
-        tr.appendTo(table);
-
-        tableEmpty = false;
+    const tr = $("<tr>");
+    for (let i = 0; i < row.length; i++) {
+        $(tableEmpty ? "<th>" : "<td>").text(row[i]).appendTo(tr);
     }
+    tr.appendTo(table);
+
+    tableEmpty = false;
 }
