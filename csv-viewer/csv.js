@@ -2,7 +2,7 @@ const CONFIG = {
     dynamicTyping: false,
     skipEmptyLines: true,
     header: false,
-    worker: true,
+    worker: false,
     step: stepFn
 };
 let start, table, tableEmpty;
@@ -13,7 +13,8 @@ $(function () {
 
     $("#csv-form").submit(function (e) {
         const fileInput = $("#csv-input");
-        if (fileInput[0].files.length !== 1) {
+        if (fileInput[0].files.length !== 1 || fileInput[0].files[0].size > 10 * 1024 * 1024) {
+            alert("Must only select one file with maximum size 10MB");
             return false;
         }
         e.preventDefault();
